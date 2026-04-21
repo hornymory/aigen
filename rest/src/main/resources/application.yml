@@ -1,0 +1,23 @@
+server:
+    port: 8080
+
+#llm:
+#    python:
+#        executable: .venv/bin/python
+#        worker-script: tools/llm_worker.py
+#        start-timeout-ms: 15000
+#        request-timeout-ms: 180000
+#    generation:
+#        n-ctx: 4096
+#        n-gpu-layers: -1
+#        n-threads: 6
+#        temperature: 0
+#        max-tokens: 256
+
+ai:
+    core:
+        base-url: ${AI_CORE_BASE_URL:http://rust-core:8081}
+#EXAMPLE
+        default-model: ${AI_CORE_DEFAULT_MODEL:gemma-3-1b-it-f16.gguf}
+ #       default-model: ${AI_CORE_DEFAULT_MODEL:}
+    models-dir: ${MODELS_DIR:models}

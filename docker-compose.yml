@@ -1,0 +1,38 @@
+services:
+  rust-core:
+    build:
+      context: ./core
+      dockerfile: Dockerfile
+    image: rust-core:latest
+    environment:
+      RUST_LOG: ${RUST_LOG:-rust_core=info,tower_http=info,axum=info}
+      LLAMA_CTX_SIZE: ${LLAMA_CTX_SIZE:-4096}
+      LLAMA_THREADS: ${LLAMA_THREADS:-8}
+      LLAMA_N_GPU_LAYERS: ${LLAMA_N_GPU_LAYERS:-999}
+    volumes:
+      - ${MODELS_DIR:-./models}:/models:ro
+    devices:
+      - /dev/dri:/dev/dri
+    ports:
+      - "8081:8081"
+      - "8091:8091"
+    restart: unless-stopped
+
+  rest-api:
+    build:
+      context: ./rest
+      dockerfile: Dockerfile
+    image: llm-api-rest:latest
+    depends_on:
+      - rust-core
+    environment:
+      AI_CORE_BASE_URL: http://rust-core:8081
+#EXAMPLE
+      AI_CORE_DEFAULT_MODEL: ${AI_CORE_DEFAULT_MODEL:-gemma-3-1b-it-f16.gguf}
+#       AI_CORE_DEFAULT_MODEL: ${AI_CORE_DEFAULT_MODEL:}
+      MODELS_DIR: /models
+    volumes:
+      - ${MODELS_DIR:-./models}:/models:ro
+    ports:
+      - "8080:8080"
+    restart: unless-stopped
